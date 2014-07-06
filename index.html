@@ -234,6 +234,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       var scene = new THREE.Scene();
       var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
+      renderer.setClearColorHex(0x080818);
+
       var ambient = new THREE.AmbientLight( 0x444444 );
       scene.add( ambient );
 
@@ -299,7 +301,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         vrBtn.addEventListener("click", function() {
           vrMode = true;
           if (renderer.domElement.webkitRequestFullscreen) {
-            renderer.domElement.webkitRequestFullscreen({ vrDisplay: hmdDevice, vrDistortion: false });
+            renderer.domElement.webkitRequestFullscreen({ vrDisplay: hmdDevice });
           } else if (renderer.domElement.mozRequestFullScreen) {
             renderer.domElement.mozRequestFullScreen({ vrDisplay: hmdDevice });
           }
