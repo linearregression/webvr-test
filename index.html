@@ -86,7 +86,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <li>Device ID: <span id="deviceId">--</span></li>
         <li>Device Name: <span id="deviceName">--</span></li>
         <li>&nbsp;</li>
-        <li>Display Resolution: <span id="resolution">--</span></li>
         <li>Render Target Resolution: <span id="renderTarget">--</span></li>
         <li>Left Eye Offset: <span id="leftTranslation">--</span></li>
         <li>Right Eye Offset: <span id="rightTranslation">--</span></li>
@@ -168,33 +167,62 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       var cameraLeft = new THREE.PerspectiveCamera( 75, 4/3, 0.1, 1000 );
       var cameraRight = new THREE.PerspectiveCamera( 75, 4/3, 0.1, 1000 );
 
+      var fovScale = 1.0;
+      function resizeFOV(amount) {
+        var fovLeft, fovRight;
+
+        if (!hmdDevice) { return; }
+
+        if (amount != 0) {
+          fovScale += amount;
+          if (fovScale < 0.1) { fovScale = 0.1; }
+
+          fovLeft = hmdDevice.getRecommendedEyeFieldOfView("left");
+          fovRight = hmdDevice.getRecommendedEyeFieldOfView("right");
+
+          fovLeft.upDegrees *= fovScale;
+          fovLeft.downDegrees *= fovScale;
+          fovLeft.leftDegrees *= fovScale;
+          fovLeft.rightDegrees *= fovScale;
+
+          fovRight.upDegrees *= fovScale;
+          fovRight.downDegrees *= fovScale;
+          fovRight.leftDegrees *= fovScale;
+          fovRight.rightDegrees *= fovScale;
+
+          hmdDevice.setFieldOfView(fovLeft, fovRight);
+        }
+
+        if ('getRecommendedRenderTargetSize' in hmdDevice) {
+          var renderTargetSize = hmdDevice.getRecommendedRenderTargetSize();
+          document.getElementById("renderTarget").innerHTML = renderTargetSize.width + "x" + renderTargetSize.height;
+        }
+
+        fovLeft = hmdDevice.getCurrentEyeFieldOfView("left");
+        cameraLeft.projectionMatrix = PerspectiveMatrixFromVRFieldOfView(fovLeft, 0.1, 1000);
+
+        fovRight = hmdDevice.getCurrentEyeFieldOfView("right");
+        cameraRight.projectionMatrix = PerspectiveMatrixFromVRFieldOfView(fovRight, 0.1, 1000);
+      }
+
       function EnumerateVRDevices(devices) {
         // First find an HMD device
         for (var i = 0; i < devices.length; ++i) {
           if (devices[i] instanceof HMDVRDevice) {
             hmdDevice = devices[i];
 
-            if ('displaySize' in hmdDevice) {
-              document.getElementById("resolution").innerHTML = hmdDevice.displaySize.width + "x" + hmdDevice.displaySize.height;
-            }
-            if ('renderTargetSize' in hmdDevice) {
-              document.getElementById("renderTarget").innerHTML = hmdDevice.renderTargetSize.width + "x" + hmdDevice.renderTargetSize.height;
-            }
-
             var eyeOffsetLeft = hmdDevice.getEyeTranslation("left");
             var eyeOffsetRight = hmdDevice.getEyeTranslation("right")
             document.getElementById("leftTranslation").innerHTML = printVector(eyeOffsetLeft);
             document.getElementById("rightTranslation").innerHTML = printVector(eyeOffsetRight);
 
-            var fovLeft = hmdDevice.getRecommendedEyeFieldOfView("left");
             cameraLeft.position.sub(eyeOffsetLeft);
-            cameraLeft.projectionMatrix = PerspectiveMatrixFromVRFieldOfView(fovLeft, 0.1, 1000);
             cameraLeft.position.z = 12;
 
-            var fovRight = hmdDevice.getRecommendedEyeFieldOfView("right");
             cameraRight.position.sub(eyeOffsetRight);
-            cameraRight.projectionMatrix = PerspectiveMatrixFromVRFieldOfView(fovRight, 0.1, 1000);
             cameraRight.position.z = 12;
+
+            resizeFOV(0.0);
           }
         }
 
@@ -224,6 +252,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           if (ev.keyCode == "R".charCodeAt(0))  {
             sensorDevice.resetSensor();
           }
+          if (ev.keyCode == 187 || ev.keyCode == 61)  { // "+" key
+            resizeFOV(0.1);
+          }
+          if (ev.keyCode == 189 || ev.keyCode == 173)  { // "-" key
+            resizeFOV(-0.1);
+          }
         }
       });
 
@@ -234,7 +268,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       var scene = new THREE.Scene();
       var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
-      renderer.setClearColorHex(0x080818);
+      renderer.setClearColor(0x202020, 1.0);
 
       var ambient = new THREE.AmbientLight( 0x444444 );
       scene.add( ambient );
