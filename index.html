@@ -173,7 +173,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
         if (!hmdDevice) { return; }
 
-        if (amount != 0) {
+        if (amount != 0 && 'setFieldOfView' in hmdDevice) {
           fovScale += amount;
           if (fovScale < 0.1) { fovScale = 0.1; }
 
@@ -198,10 +198,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           document.getElementById("renderTarget").innerHTML = renderTargetSize.width + "x" + renderTargetSize.height;
         }
 
-        fovLeft = hmdDevice.getCurrentEyeFieldOfView("left");
-        cameraLeft.projectionMatrix = PerspectiveMatrixFromVRFieldOfView(fovLeft, 0.1, 1000);
+        if ('getCurrentEyeFieldOfView' in hmdDevice) {
+          fovLeft = hmdDevice.getCurrentEyeFieldOfView("left");
+          fovRight = hmdDevice.getCurrentEyeFieldOfView("right");
+        } else {
+          fovLeft = hmdDevice.getRecommendedEyeFieldOfView("left");
+          fovRight = hmdDevice.getRecommendedEyeFieldOfView("right");
+        }
 
-        fovRight = hmdDevice.getCurrentEyeFieldOfView("right");
+        cameraLeft.projectionMatrix = PerspectiveMatrixFromVRFieldOfView(fovLeft, 0.1, 1000);
         cameraRight.projectionMatrix = PerspectiveMatrixFromVRFieldOfView(fovRight, 0.1, 1000);
       }
 
