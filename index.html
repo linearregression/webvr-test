@@ -107,6 +107,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <script src="js/three.min.js"></script>
     <script src="js/loaders/OBJLoader.js"></script>
     <script>
+      var VR_POSITION_SCALE = 25;
+
       function printVector(values) {
         var str = "[";
 
@@ -372,9 +374,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         linearAcceleration.innerHTML = printVector(vrState.linearAcceleration);
 
         if (riftObj) {
-          riftObj.position.x = vrState.position.x;
-          riftObj.position.y = vrState.position.y;
-          riftObj.position.z = vrState.position.z;
+          riftObj.position.x = vrState.position.x * VR_POSITION_SCALE;
+          riftObj.position.y = vrState.position.y * VR_POSITION_SCALE;
+          riftObj.position.z = vrState.position.z * VR_POSITION_SCALE;
 
           riftObj.quaternion.x = vrState.orientation.x;
           riftObj.quaternion.y = vrState.orientation.y;
