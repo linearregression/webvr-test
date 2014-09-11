@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         background-color: #000000;
       }
       canvas {
-        width: 100%;
-        height: 100%;
+        width: 100% !important;
+        height: 100% !important;
         position: absolute;
         top: 0;
         left: 0;
@@ -131,6 +131,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       var hmdDevice = null;
       var vrMode = false;
       var stats = document.getElementById("stats");
+      var renderTargetWidth = 1920;
+      var renderTargetHeight = 1080;
 
       function PerspectiveMatrixFromVRFieldOfView(fov, zNear, zFar) {
         var outMat = new THREE.Matrix4();
@@ -195,10 +197,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           hmdDevice.setFieldOfView(fovLeft, fovRight);
         }
 
-        if ('getRecommendedRenderTargetSize' in hmdDevice) {
-          var renderTargetSize = hmdDevice.getRecommendedRenderTargetSize();
-          document.getElementById("renderTarget").innerHTML = renderTargetSize.width + "x" + renderTargetSize.height;
+        if ('getRecommendedEyeRenderRect' in hmdDevice) {
+          var leftEyeViewport = hmdDevice.getRecommendedEyeRenderRect("left");
+          var rightEyeViewport = hmdDevice.getRecommendedEyeRenderRect("right");
+          renderTargetWidth = leftEyeViewport.width + rightEyeViewport.width;
+          renderTargetHeight = Math.max(leftEyeViewport.height, rightEyeViewport.height);
+          document.getElementById("renderTarget").innerHTML = renderTargetWidth + "x" + renderTargetHeight;
         }
+
+        resize();
 
         if ('getCurrentEyeFieldOfView' in hmdDevice) {
           fovLeft = hmdDevice.getCurrentEyeFieldOfView("left");
@@ -223,10 +230,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             document.getElementById("leftTranslation").innerHTML = printVector(eyeOffsetLeft);
             document.getElementById("rightTranslation").innerHTML = printVector(eyeOffsetRight);
 
-            cameraLeft.position.sub(eyeOffsetLeft);
+            cameraLeft.position.add(eyeOffsetLeft);
             cameraLeft.position.z = 12;
 
-            cameraRight.position.sub(eyeOffsetRight);
+            cameraRight.position.add(eyeOffsetRight);
             cameraRight.position.z = 12;
 
             resizeFOV(0.0);
@@ -271,7 +278,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       //
       // Rendering
       //
-      var renderer = new THREE.WebGLRenderer({ preserveDrawingBuffer: true });
+      var renderer = new THREE.WebGLRenderer();
       var scene = new THREE.Scene();
       var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
@@ -318,9 +325,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       camera.position.z = 12;
 
       function resize() {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize( window.innerWidth, window.innerHeight );
+        if (vrMode) {
+          camera.aspect = renderTargetWidth / renderTargetHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize( renderTargetWidth, renderTargetHeight );
+        } else {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize( window.innerWidth, window.innerHeight );
+        }
       }
       resize();
       window.addEventListener("resize", resize, false);
@@ -341,6 +354,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       if (vrBtn) {
         vrBtn.addEventListener("click", function() {
           vrMode = true;
+          resize();
           if (renderer.domElement.webkitRequestFullscreen) {
             renderer.domElement.webkitRequestFullscreen({ vrDisplay: hmdDevice });
           } else if (renderer.domElement.mozRequestFullScreen) {
@@ -399,13 +413,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         if (vrMode) {
           // Render left eye
           renderer.enableScissorTest ( true );
-          renderer.setScissor( 0, 0, window.innerWidth / 2, window.innerHeight );
-          renderer.setViewport( 0, 0, window.innerWidth / 2, window.innerHeight );
+          renderer.setScissor( 0, 0, renderTargetWidth / 2, renderTargetHeight );
+          renderer.setViewport( 0, 0, renderTargetWidth / 2, renderTargetHeight );
           renderer.render(scene, cameraLeft);
 
           // Render right eye
-          renderer.setScissor( window.innerWidth / 2, 0, window.innerWidth / 2, window.innerHeight );
-          renderer.setViewport( window.innerWidth / 2, 0, window.innerWidth / 2, window.innerHeight );
+          renderer.setScissor( renderTargetWidth / 2, 0, renderTargetWidth / 2, renderTargetHeight );
+          renderer.setViewport( renderTargetWidth / 2, 0, renderTargetWidth / 2, renderTargetHeight );
           renderer.render(scene, cameraRight);
         } else {
           // Render mono view
