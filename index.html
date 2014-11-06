@@ -276,7 +276,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       window.addEventListener("keydown", function(ev) {
         if (hmdDevice) {
           if (ev.keyCode == "R".charCodeAt(0))  {
-            sensorDevice.resetSensor();
+            sensorDevice.zeroSensor();
           }
           if (ev.keyCode == 187 || ev.keyCode == 61)  { // "+" key
             resizeFOV(0.1);
@@ -350,6 +350,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       resize();
       window.addEventListener("resize", resize, false);
 
+      renderer.domElement.addEventListener("touchstart", function(ev) {
+        if (sensorDevice) {
+          sensorDevice.zeroSensor();
+        }
+      });
+
       // Fullscreen VR mode handling
 
       function onFullscreenChange() {
@@ -400,14 +406,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         linearAcceleration.innerHTML = printVector(vrState.linearAcceleration);
 
         if (riftObj) {
-          riftObj.position.x = vrState.position.x * VR_POSITION_SCALE;
-          riftObj.position.y = vrState.position.y * VR_POSITION_SCALE;
-          riftObj.position.z = vrState.position.z * VR_POSITION_SCALE;
+          if (vrState.position) {
+            riftObj.position.x = vrState.position.x * VR_POSITION_SCALE;
+            riftObj.position.y = vrState.position.y * VR_POSITION_SCALE;
+            riftObj.position.z = vrState.position.z * VR_POSITION_SCALE;
+          }
 
-          riftObj.quaternion.x = vrState.orientation.x;
-          riftObj.quaternion.y = vrState.orientation.y;
-          riftObj.quaternion.z = vrState.orientation.z;
-          riftObj.quaternion.w = vrState.orientation.w;
+          if (vrState.orientation) {
+            riftObj.quaternion.x = vrState.orientation.x;
+            riftObj.quaternion.y = vrState.orientation.y;
+            riftObj.quaternion.z = vrState.orientation.z;
+            riftObj.quaternion.w = vrState.orientation.w;
+          }
         }
 
         return true;
