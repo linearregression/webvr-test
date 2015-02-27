@@ -231,6 +231,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         cameraRight.projectionMatrix = PerspectiveMatrixFromVRFieldOfView(fovRight, 0.1, 1000);
       }
 
+      function resetSensor() {
+        if ('resetSensor' in sensorDevice) {
+          sensorDevice.resetSensor();
+        } else if ('zeroSensor' in sensorDevice) {
+          sensorDevice.zeroSensor();
+        }
+      }
+
       function EnumerateVRDevices(devices) {
         // First find an HMD device
         for (var i = 0; i < devices.length; ++i) {
@@ -249,6 +257,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             cameraRight.position.z = 12;
 
             resizeFOV(0.0);
+            resetSensor();
           }
         }
 
@@ -276,7 +285,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       window.addEventListener("keydown", function(ev) {
         if (hmdDevice) {
           if (ev.keyCode == "R".charCodeAt(0))  {
-            sensorDevice.zeroSensor();
+            resetSensor();
           }
           if (ev.keyCode == 187 || ev.keyCode == 61)  { // "+" key
             resizeFOV(0.1);
