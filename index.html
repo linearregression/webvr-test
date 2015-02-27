@@ -232,10 +232,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       }
 
       function resetSensor() {
-        if ('resetSensor' in sensorDevice) {
-          sensorDevice.resetSensor();
-        } else if ('zeroSensor' in sensorDevice) {
-          sensorDevice.zeroSensor();
+        if (sensorDevice) {
+          if ('resetSensor' in sensorDevice) {
+            sensorDevice.resetSensor();
+          } else if ('zeroSensor' in sensorDevice) {
+            sensorDevice.zeroSensor();
+          }
         }
       }
 
@@ -257,7 +259,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             cameraRight.position.z = 12;
 
             resizeFOV(0.0);
-            resetSensor();
           }
         }
 
@@ -269,6 +270,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             document.getElementById("hardwareUnitId").innerHTML = sensorDevice.hardwareUnitId;
             document.getElementById("deviceId").innerHTML = sensorDevice.deviceId;
             document.getElementById("deviceName").innerHTML = sensorDevice.deviceName;
+            resetSensor();
           }
         }
       }
@@ -360,9 +362,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       window.addEventListener("resize", resize, false);
 
       renderer.domElement.addEventListener("touchstart", function(ev) {
-        if (sensorDevice) {
-          sensorDevice.zeroSensor();
-        }
+        resetSensor();
       });
 
       // Fullscreen VR mode handling
