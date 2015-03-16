@@ -1,0 +1,32 @@
+newmtl polySurface28SG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd wooden_mirror_color.png
+bump uppershell_bump.tif -bm 0.1
+Ni 1.00
+Ks 0.00 0.00 0.00
+Ns 0.00
+newmtl polySurface33SG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd mirror.tif
+Ni 1.00
+Ks 0.00 0.00 0.00
+map_Ks mirror.tif
+Ns 0.00
+newmtl transform2SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+newmtl transform3SG
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.50 0.50 0.50
+Tf 1.00 1.00 1.00
+Ni 1.00
