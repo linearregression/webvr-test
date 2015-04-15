@@ -91,7 +91,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <li>Right Eye Offset: <span id="rightTranslation">--</span></li>
         <li>&nbsp;</li>
         <li>Timestamp: <span id="timestamp">--</span></li>
-        <li>Orientation: <span id="orientation">--</span></li>
+        <li>Orientation: <span id="orientQuat">--</span></li>
         <li>Position: <span id="position">--</span></li>
         <li>AngularVelocity: <span id="angularVelocity">--</span></li>
         <li>LinearVelocity: <span id="linearVelocity">--</span></li>
@@ -293,7 +293,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       //
 
       var timestamp = document.getElementById("timestamp");
-      var orientationTxt = document.getElementById("orientation");
+      var orientQuat = document.getElementById("orientQuat");
       var position = document.getElementById("position");
       var angularVelocity = document.getElementById("angularVelocity");
       var linearVelocity = document.getElementById("linearVelocity");
@@ -306,7 +306,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         if (!vrControls.lastState) return;
         
         timestamp.innerHTML = vrState.timeStamp.toFixed(2);
-        orientationTxt.innerHTML = printVector(vrState.orientation);
+        orientQuat.innerHTML = printVector(vrState.orientation);
         position.innerHTML = printVector(vrState.position);
         angularVelocity.innerHTML = printVector(vrState.angularVelocity);
         linearVelocity.innerHTML = printVector(vrState.linearVelocity);
