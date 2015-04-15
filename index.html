@@ -305,13 +305,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         var vrState = vrControls.lastState;
         if (!vrControls.lastState) return;
         
-        timestamp.innerHTML = vrState.timeStamp.toFixed(2);
-        orientation.innerHTML = printVector(vrState.orientation);
-        position.innerHTML = printVector(vrState.position);
-        angularVelocity.innerHTML = printVector(vrState.angularVelocity);
-        linearVelocity.innerHTML = printVector(vrState.linearVelocity);
-        angularAcceleration.innerHTML = printVector(vrState.angularAcceleration);
-        linearAcceleration.innerHTML = printVector(vrState.linearAcceleration);
+        try {
+          timestamp.innerHTML = vrState.timeStamp.toFixed(2);
+          orientation.innerHTML = printVector(vrState.orientation);
+          position.innerHTML = printVector(vrState.position);
+          angularVelocity.innerHTML = printVector(vrState.angularVelocity);
+          linearVelocity.innerHTML = printVector(vrState.linearVelocity);
+          angularAcceleration.innerHTML = printVector(vrState.angularAcceleration);
+          linearAcceleration.innerHTML = printVector(vrState.linearAcceleration);
+        } catch(err) {
+          linearAcceleration.innerHTML = err.message;
+        }
       }
 
       function render(t) {
