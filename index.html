@@ -293,7 +293,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       //
 
       var timestamp = document.getElementById("timestamp");
-      var orientation = document.getElementById("orientation");
+      var orientationTxt = document.getElementById("orientation");
       var position = document.getElementById("position");
       var angularVelocity = document.getElementById("angularVelocity");
       var linearVelocity = document.getElementById("linearVelocity");
@@ -305,17 +305,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         var vrState = vrControls.lastState;
         if (!vrControls.lastState) return;
         
-        try {
-          timestamp.innerHTML = vrState.timeStamp.toFixed(2);
-          orientation.innerHTML = printVector(vrState.orientation);
-          position.innerHTML = printVector(vrState.position);
-          angularVelocity.innerHTML = printVector(vrState.angularVelocity);
-          linearVelocity.innerHTML = printVector(vrState.linearVelocity);
-          angularAcceleration.innerHTML = printVector(vrState.angularAcceleration);
-          linearAcceleration.innerHTML = printVector(vrState.linearAcceleration);
-        } catch(err) {
-          linearAcceleration.innerHTML = err.message;
-        }
+        timestamp.innerHTML = vrState.timeStamp.toFixed(2);
+        orientationTxt.innerHTML = printVector(vrState.orientation);
+        position.innerHTML = printVector(vrState.position);
+        angularVelocity.innerHTML = printVector(vrState.angularVelocity);
+        linearVelocity.innerHTML = printVector(vrState.linearVelocity);
+        angularAcceleration.innerHTML = printVector(vrState.angularAcceleration);
+        linearAcceleration.innerHTML = printVector(vrState.linearAcceleration);
       }
 
       function render(t) {
