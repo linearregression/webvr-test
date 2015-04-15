@@ -146,7 +146,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         }
 
         var hmdDevice = vrEffect._vrHMD;
-        if (!hmdDevice) { return; }
+        if (!hmdDevice || !('getEyeParameters' in hmdDevice)) { return; }
 
         var leftEye = hmdDevice.getEyeParameters("left");
         var rightEye = hmdDevice.getEyeParameters("right");
@@ -312,21 +312,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         linearVelocity.innerHTML = printVector(vrState.linearVelocity);
         angularAcceleration.innerHTML = printVector(vrState.angularAcceleration);
         linearAcceleration.innerHTML = printVector(vrState.linearAcceleration);
-
-        if (riftObj) {
-          if (vrState.position) {
-            riftObj.position.x = vrState.position.x * VR_POSITION_SCALE;
-            riftObj.position.y = vrState.position.y * VR_POSITION_SCALE;
-            riftObj.position.z = vrState.position.z * VR_POSITION_SCALE;
-          }
-
-          if (vrState.orientation) {
-            riftObj.quaternion.x = vrState.orientation.x;
-            riftObj.quaternion.y = vrState.orientation.y;
-            riftObj.quaternion.z = vrState.orientation.z;
-            riftObj.quaternion.w = vrState.orientation.w;
-          }
-        }
       }
 
       function render(t) {
