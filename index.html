@@ -138,7 +138,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       var vrAvailable = true;
       var stats = document.getElementById("stats");
 
-      /*function updateEyeParameters() {
+      function updateHMDProperties(error) {
+        if (error) {
+          stats.classList.add("error");
+          stats.innerHTML = "WebVR API not supported";
+          vrAvailable = false;
+        }
+
+        var hmdDevice = vrEffect._vrHMD;
         if (!hmdDevice) { return; }
 
         var leftEye = hmdDevice.getEyeParameters("left");
@@ -153,29 +160,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         renderTargetHeight = Math.max(leftEye.renderRect.height, rightEye.renderRect.height);
         document.getElementById("renderTarget").innerHTML = renderTargetWidth + "x" + renderTargetHeight;
 
+        document.getElementById("hardwareUnitId").innerHTML = hmdDevice.hardwareUnitId;
+        document.getElementById("deviceId").innerHTML = hmdDevice.deviceId;
+        document.getElementById("deviceName").innerHTML = hmdDevice.deviceName;
+
         resize();
-      }*/
-
-      function EnumerateVRDevices(devices) {
-        // First find an HMD device
-        for (var i = 0; i < devices.length; ++i) {
-          if (devices[i] instanceof HMDVRDevice) {
-            hmdDevice = devices[i];
-            updateEyeParameters();
-          }
-        }
-
-        // Next find a sensor that matches the HMD hardwareUnitId
-        for (var i = 0; i < devices.length; ++i) {
-          if (devices[i] instanceof PositionSensorVRDevice &&
-               (!hmdDevice || devices[i].hardwareUnitId == hmdDevice.hardwareUnitId)) {
-            sensorDevice = devices[i];
-            document.getElementById("hardwareUnitId").innerHTML = sensorDevice.hardwareUnitId;
-            document.getElementById("deviceId").innerHTML = sensorDevice.deviceId;
-            document.getElementById("deviceName").innerHTML = sensorDevice.deviceName;
-            resetSensor();
-          }
-        }
       }
 
       //
@@ -237,7 +226,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           object.scale.y = 3.0;
           object.scale.z = 3.0;
 
-          object.position.x = 3.0;
+          object.position.x = 1.5;
           object.position.y = -4.0;
           object.position.z = 0.0;
 
@@ -252,13 +241,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       var vrBtn = document.getElementById("vrBtn");
 
       vrControls = new THREE.VRControls(camera);
-      vrEffect = new THREE.VREffect(renderer, function (error) {
-        if (error) {
-          stats.classList.add("error");
-          stats.innerHTML = "WebVR API not supported";
-          vrAvailable = false;
-        }
-      });
+      vrEffect = new THREE.VREffect(renderer, updateHMDProperties);
 
       vrControls.scale = VR_POSITION_SCALE;
       camera.scale.x = VR_POSITION_SCALE;
@@ -317,10 +300,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       var angularAcceleration = document.getElementById("angularAcceleration");
       var linearAcceleration = document.getElementById("linearAcceleration");
 
-      /*function updateVRDevice() {
-        if (!sensorDevice) return false;
-        var vrState = sensorDevice.getState();
-
+      function updateVRDevice() {
+        vrControls.update();
+        var vrState = vrControls.lastState;
+        if (!vrControls.lastState) return;
+        
         timestamp.innerHTML = vrState.timeStamp.toFixed(2);
         orientation.innerHTML = printVector(vrState.orientation);
         position.innerHTML = printVector(vrState.position);
@@ -343,9 +327,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             riftObj.quaternion.w = vrState.orientation.w;
           }
         }
-
-        return true;
-      }*/
+      }
 
       function render(t) {
         requestAnimationFrame(render);
@@ -356,7 +338,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           rift.rotation.y += 0.01;
         }
 
-        vrControls.update();
+        updateVRDevice();
 
         riftObj.position.copy(camera.position);
         riftObj.position.z *= -1.0;

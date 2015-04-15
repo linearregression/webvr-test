@@ -47,11 +47,15 @@ THREE.VRControls = function ( object, callback ) {
 	// are converted to scene units.
 	this.scale = 1;
 
+	// State from the most recent update so apps can access it directly if needed.
+	this.lastState = null;
+
 	this.update = function () {
 
 		if ( vrInput === undefined ) return;
 
 		var state = vrInput.getState();
+		this.lastState = state;
 
 		if ( state.orientation !== null ) {
 
