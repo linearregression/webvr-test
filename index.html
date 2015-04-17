@@ -145,7 +145,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           vrAvailable = false;
         }
 
-        var hmdDevice = vrEffect._vrHMD;
+        var hmdDevice = vrEffect.getHMDVRDevice();
         if (!hmdDevice || !('getEyeParameters' in hmdDevice)) { return; }
 
         var leftEye = hmdDevice.getEyeParameters("left");
